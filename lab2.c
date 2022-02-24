@@ -38,7 +38,7 @@ int PScheduler(void){
                 for(k=0;k<1000;k++) {
                     asm("nop"); }}
             printf(1, "\n child# %d with priority %d has finished! \n",getpid(),30-10*i);
-            printf(1, "\n child# %d finished with priority %d  \n",getpid(),getpriority()); // aging tests
+            printf(1, "\n ------------child# %d finished with updated priority %d  \n",getpid(),getpriority()); // aging tests
             exit(0);
         }
         else {

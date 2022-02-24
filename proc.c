@@ -92,6 +92,10 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
 
+  //setting timer for process lab 2
+  p->timerStart = ticks; //ticks from defs.h ..will use to measure time
+  cprintf("\n------------Init time of %d process: %d \n",p->pid, p->timerStart); //print
+
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -251,6 +255,16 @@ exit(int status)
   end_op();
   curproc->cwd = 0;
 
+  //turnaround time - lab2 : after process ends
+  int timer_finished = ticks;   //catch time at finish
+  cprintf("\n------------End time of process #%d : %d \n",curproc->pid, timer_finished); //print
+  int turnaroundTime = timer_finished - curproc->timerStart; //get time difference
+//  cprintf("\n------------Turnaround time for this process: %d \n", turnaroundTime); //print
+  cprintf("\n------------Turnaround time for process #%d: %d \n",curproc->pid, turnaroundTime); //print
+  cprintf("\n------------Waiting time for process #%d: %d \n",curproc->pid, turnaroundTime - curproc->burst_time); //print
+
+
+
   acquire(&ptable.lock);
 
   // Parent might be sleeping in wait().
@@ -365,19 +379,24 @@ scheduler(void)
         if (p_2->state == RUNNABLE) {
 
           if(p_2 == p && p_2->priority_value < 31) {
-            p_2->priority_value = p_2->priority_value + 1;
+            p_2->priority_value = p_2->priority_value + 1;   //age the currently running process
           }
 
           else if(p_2 != p && p_2->priority_value > 0){
-            p_2->priority_value = p_2->priority_value - 1;
+            p_2->priority_value = p_2->priority_value - 1;   //rise priority to other processes in the ready queue
           }
 
         }
       }
+
 //      cprintf("Priority_value of \n pid: %d pv: %d\n----------", p->pid, p->priority_value);
       //---------------------aging---------------------
 
       c->proc = p;
+
+      // Lab 2
+      p->start_time = ticks;
+
       switchuvm(p);
       p->state = RUNNING;
 
@@ -416,6 +435,10 @@ sched(void)
   if(readeflags()&FL_IF)
     panic("sched interruptible");
   intena = mycpu()->intena;
+
+  // Lab 2
+  p->burst_time = p->burst_time + ticks - p->start_time;
+
   swtch(&p->context, mycpu()->scheduler);
   mycpu()->intena = intena;
 }

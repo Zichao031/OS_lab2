@@ -51,6 +51,10 @@ struct proc {
   char name[16];               // Process name (debugging)
   int exitStat;                // Lab 1 Part a exit(int)
   int  priority_value;         // Process priority value
+  int timerStart;              // Lab 2 - keeps track of process time
+  int burst_time;              // Lab 2 - actual running time
+  int start_time;              // Lab 2
+
 };
 
 // Process memory is laid out contiguously, low addresses first:
